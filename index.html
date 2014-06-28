@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <title>Document</title>
   <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="./library/namespace/namespace.js"></script>
+  <script type="text/javascript" src="./library/main/app.js"></script>
+  <script type="text/javascript" src="./library/main/canvas.js"></script>
+  <script type="text/javascript" src="./library/main/setEventBox.js"></script>
+
+  <script type="text/javascript" src="./app/map.js"></script>
   <script>
   $(function(){
     var host = "ws://localhost:8080/";
@@ -15,7 +21,16 @@
     }
     socket.onmessage = function(message){
       console.log(socket.readyState + " " + message.data);
-      document.getElementById("res").innerHTML =  message.data;
+      try {
+        var str = message.data;console.log("--->" + str);
+        var str2 = str.replace("\r", "\\\\r");console.log("--->" + str2);
+        var answer = JSON.parse(str2);
+      } catch (e) {
+        console.log('out');
+      }
+
+
+      document.getElementById("res").innerHTML =  answer;
     }
     socket.onclose = function(){
       console.log(socket.readyState);
@@ -29,6 +44,18 @@
       message = $("#message").val()
       socket.send(message);
     });
+
+
+
+
+
+
+
+
+
+
+
+
   })
   </script>
 </head>
@@ -36,5 +63,23 @@
   <h1>Hello World!</h1>
   <input type="text" id="message" /><button id="sendBtn">send</button><br />
   <div id="res"></div>
+
+
+
+
+
+
+  <div><canvas id="myCanvas" width="2000" height="1600">
+    Canvasが利用できるブラウザを使用してください。
+  </canvas></div>
+  <div id="status"></div>
+
+
+
+
+
+
+
+
 </body>
 </html>

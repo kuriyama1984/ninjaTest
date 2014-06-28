@@ -48,7 +48,7 @@ server.on("connection",
         console.log("message " + data);
         server.clients.forEach(
           function(client) {
-            client.send(data);
+            client.send( JSON.stringify({key: data + "\r \b \f \n" + "---"}) );
           }
         );
       }
