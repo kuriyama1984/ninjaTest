@@ -5,7 +5,6 @@
     var canvasObj;
     var globalRatio = 1;
 
-
 	// get mouse position
     ns.getMousePosition = function (e) {
 		var clickX = (e.clientX) ? e.clientX : e.pageX;
@@ -121,21 +120,14 @@
         		alert('call back');
         	}
 
-
-
         }, true);
-
-
-
-
-
 
 
     };
 
 
 
-// util
+    // util
     ns.getBitLength = function (str) {
 	    var r = 0; 
 	    for (var i = 0; i < str.length; i++) { 
@@ -149,7 +141,7 @@
 	        } 
 	    } 
 	    return r; 
-	} 
+	};
 
 
 

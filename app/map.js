@@ -19,9 +19,24 @@
             // get mouse position
             var mousePosition = getMousePosition(e);
 
-            eventBox.create(mousePosition.x, mousePosition.y, 1, callback);
+            eventBox.create(mousePosition.x, mousePosition.y, 1, handler);
 
         }, true);
+
+        // click event
+        canvasObj.addEventListener("click", function(e) {
+
+            // get mouse position
+            var mousePosition = getMousePosition(e);
+
+            eventBox.AddPopUp(mousePosition.x, mousePosition.y, 1, handler);
+
+        }, true);
+
+
+
+
+
 
         // get mouse position
         var getMousePosition = function (e) {
@@ -31,10 +46,15 @@
             return {x: clickX - rect.left, y: clickY - rect.top};
         };
 
-        var callback = {
+        var handler = {
             on: function (id) {
-                console.log('callback ' + id);
-            }
+                this.id = id;
+                console.log('handler ' + this.id);
+                return id;
+            },
+            id: '',
+            isOnSquare: false,
+            isPopUp: false
         };
 
         // background
@@ -50,22 +70,24 @@
 
         var dataObj = {
             id001: {
-                id: '001',
+                id: 'id001',
                 x: 300,
                 y: 100,
                 s: 1,
                 text: 'test aaaa',
+                popUpText: 'これはテストです。¥nああああああああああああああああああああ¥nあああああああああああああああああ¥nいいいいいいい',
                 color: '#0000FF'
             },
             id002: {
-                id: '002',
+                id: 'id002',
                 x: 300,
                 y: 200,
                 s: 1,
                 text: 'test bb あああ',
+                popUpText: 'これはテストです。いいいいいいいいいいいいいいいいいい',
                 color: '#FF0000'
             }
-        }
+        };
 
 		var eventBox = Object.create(mamsa.setEventBox.prototype, {
             data: {
@@ -82,8 +104,9 @@
             }
 		});
 		// console.log(eventBox);
-		eventBox.create(-1, -1, 1, callback);
-        //eventBox.create(mouseX, mouseY, viewRatio, callback);
+        eventBox.init(handler);
+		// eventBox.create(-1, -1, 1, handler);
+        //eventBox.create(mouseX, mouseY, viewRatio, handler);
 
     }, true);
 

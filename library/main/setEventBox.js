@@ -3,44 +3,86 @@
     var ns = mamsa.addNamespace(namespace);
 
     var setEventBox = function () {};
+    var pupUpSize = 1;
+    var pupUpX = 0;
+    var pupUpY = 0;
+    var context = null;
+    var popUps = [];
 
-    // eventBox is 
+    // eventBox is compornent of map which show events or purpose
     setEventBox.prototype = {
         data: null,
         context: null,
-        create: function (mouseX, mouseY, viewRatio, callback) {
+        popUp: null,
+        // popUp: Object.create(mamsa.setPopUp.prototype),
+        init: function (handler) {
+            // this.popUp = Object.create(mamsa.setPopUp.prototype)
 
-            for(var id in this.data){
+            this.popUp = Object.create(mamsa.setPopUp.prototype, {
+                context: {
+                    value: this.context,
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                }
+            });
+            this.create(-1, -1, 1, handler);
+
+        },
+        create: function (mouseX, mouseY, viewRatio, handler) {
+
+            context = this.context;
+            handler.isOnSquare = false;
+
+            for (var id in this.data) {
                 var data = this.data[id];
 
                 // view create
-                var ele = getComponentElements(data, viewRatio, this.context);
+                var ele = getComponentElements(data, viewRatio);
 
                 // return 6 when illegall argment 
                 if (ele === null) {return 6;}
 
                 // over
                 if (isOnSquare(mouseX, mouseY, ele)) {
+                    handler.on(data.id);
+                    handler.isOnSquare = true;
                     setComponent(ele, data.text, '#FF0000');
-                    callback.on(data.id);
+                    this.popUp.show(data, viewRatio, handler, mouseX, mouseY);
 
                 // usual
                 } else {
                     setComponent(ele, data.text, '#0000FF');
                 }
             }
+
+            for (var i = 0; i < popUps.length; i++) {
+                popUps[i].show(null, viewRatio, handler);
+            }
+
+
+        },
+        AddPopUp: function (mouseX, mouseY, viewRatio, handler) {
+            pupUpX = mouseX;
+            pupUpY = mouseY;
+            // var data = this.data[handler.id];
+            if (handler.isOnSquare) {
+
+                createPopUp(this.data[handler.id], context).show(null, viewRatio, handler, mouseX, mouseY);
+            }
         }
+
     };
 
     // get eventBox position
-    var getComponentElements = function (data, viewRatio, context) {
+    var getComponentElements = function (data, viewRatio) {
 
         if (data) {
-            x = data.x;
-            y = data.y;
-            s = data.s;
-            text = data.text;
-            color = data.color;
+            var x = data.x;
+            var y = data.y;
+            var s = data.s;
+            var text = data.text;
+            var color = data.color;
         }
 
         // set size change sizeRatio
@@ -69,8 +111,7 @@
             wSuare: squareWidth,
 
             // ratio and context
-            ratio: sizeRatio,
-            cxt: context
+            ratio: sizeRatio
         };
     }
 
@@ -78,10 +119,9 @@
     var setComponent = function (element, text, color) {
 
         // return initial value of context 
-        if (element === null || !element.cxt) {
+        if (element === null) {
             return null;
         } else {
-            context = element.cxt;
             sizeRatio = element.sizeRatio;
             xTrans = element.xTrans;
             yTrans = element.yTrans;
@@ -106,6 +146,51 @@
         // recover size
         context.translate(-1 * xTrans, -1 * yTrans);
         context.scale(1 / sizeRatio, 1 / sizeRatio);
+    };
+
+    // create comportnent of eventBox
+    var createPopUp = function (dataObj, ctx) {
+
+        var popUpObj = Object.create(mamsa.setPopUp.prototype, {
+            data: {
+                value: dataObj,
+                writable: true,
+                configurable: true,
+                enumerable: true
+            },
+            context: {
+                value: ctx,
+                writable: true,
+                configurable: true,
+                enumerable: true
+            }
+        });
+
+        // popUpObj.init();
+        popUps.push(popUpObj);
+        return popUpObj;
+    };
+
+    // return maximum length of width
+    var widthText = function (textArray, context) {
+
+        var widthMax = 0;
+        for (var i = 0; i < textArray.length; i++) {
+
+            // select longger width
+            var textWidth = context.measureText(textArray[i]).width;
+            if (widthMax < textWidth) {
+                widthMax = textWidth;
+            }
+        }
+
+        return widthMax;
+    };
+
+    // divide text to segments
+    var splitText = function (text) {
+
+        return text.split('¥n');
     };
 
     // check mouse on the square
